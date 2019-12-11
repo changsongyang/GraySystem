@@ -1,4 +1,4 @@
-package com.huangyuan.open.gray.common.component;
+package com.huangyuan.open.gray.common.component.mq;
 
 import com.alibaba.rocketmq.client.consumer.DefaultMQPushConsumer;
 import com.alibaba.rocketmq.client.consumer.listener.MessageListener;

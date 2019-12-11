@@ -4,7 +4,7 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
-import com.huangyuan.open.gray.common.component.CustomLoadBalance;
+import com.huangyuan.open.gray.common.component.api.CustomLoadBalance;
 import com.huangyuan.open.gray.common.component.GrayComponent;
 import com.huangyuan.open.gray.common.utils.SpringContextUtil;
 import org.slf4j.Logger;

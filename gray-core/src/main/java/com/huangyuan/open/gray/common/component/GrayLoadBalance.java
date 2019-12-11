@@ -4,12 +4,13 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.cluster.loadbalance.LeastActiveLoadBalance;
+import com.huangyuan.open.gray.common.component.api.CustomLoadBalance;
 import com.huangyuan.open.gray.common.utils.SpringContextUtil;
 
 import java.util.List;
 
 /**
- * 灰度负载均衡（用于非web、fcp项目）
+ * 灰度负载均衡（用于非接入层项目）
  * @author huangy on 2018/8/20
  */
 public class GrayLoadBalance extends LeastActiveLoadBalance implements CustomLoadBalance {

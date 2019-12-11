@@ -1,4 +1,4 @@
-package com.huangyuan.open.gray.common.component;
+package com.huangyuan.open.gray.common.component.mq;
 
 import com.google.common.collect.Lists;
 import com.huangyuan.open.gray.common.support.GrayHandlerHelper;

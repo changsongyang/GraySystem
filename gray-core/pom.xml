@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>gray-common</artifactId>
+    <artifactId>gray-core</artifactId>
     <packaging>jar</packaging>
 
     <name>gray-common Maven Webapp</name>

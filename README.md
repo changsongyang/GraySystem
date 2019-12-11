@@ -22,7 +22,7 @@
 ![Snip20180920_1](http://ww2.sinaimg.cn/large/006y8mN6gy1g6ua2h29mdj30z20h075i.jpg)
 
 
-## 使用方法：
+## 使用方法
 
 ### 服务引入灰度配置
 1、创建 META-INF.dubbo文件夹
@@ -119,3 +119,13 @@ PS: 如果部署有问题，请致邮件：  296947440@qq.com  除了上班时�
 每一个服务定时拉取灰度配置，判读该服务所处的机器是否灰度机器。
 灰度机器则初始化mq，可以处理mq消息；正式机器则关闭mq，不处理mq消息。<br/>
 目前仅支持RocketMQ。读者可以自己实现类似的MQ灰度，从而使用其他MQ中间件。
+
+<br/>
+<br/>
+
+## 源码解析
+核心代码在gray-core模块
+- 划分灰度环境: com.huangyuan.open.gray.common.component.GrayBeanPostProcessor
+- 动态路由: com.huangyuan.open.gray.common.component.GrayLoadBalance
+- 代理层实现外部调用灰度: 见gray-proxy-api模块
+- mq灰度处理：见com.huangyuan.open.gray.common.component.mq包下的文件

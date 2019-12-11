@@ -10,7 +10,7 @@
   <artifactId>gray-system</artifactId>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>gray-common</module>
+    <module>gray-core</module>
     <module>gray-config-api</module>
     <module>gray-config-provider</module>
     <module>gray-config-admin</module>
