@@ -13,11 +13,12 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
+ * 用于代理的负载均衡
  * @author huangy on 2018/8/20
  */
-public class PorxyLoadBalance extends LeastActiveLoadBalance implements CustomLoadBalance {
+public class ProxyLoadBalance extends LeastActiveLoadBalance implements CustomLoadBalance {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PorxyLoadBalance.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyLoadBalance.class);
 
     @Override
     protected<T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
