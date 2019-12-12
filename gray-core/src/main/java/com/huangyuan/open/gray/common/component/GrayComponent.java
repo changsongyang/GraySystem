@@ -52,9 +52,6 @@ public class GrayComponent {
     public <T> Invoker<T> selectByEa(List<Invoker<T>> invokers, URL url, Invocation invocation,
                                      String fsEa, CustomLoadBalance loadBalance) {
 
-        // 临时invoker数组，里面可能是正常invoker、也可能是灰度invoker，具体看处理逻辑
-        List<Invoker<T>> temInvokers = new ArrayList<>();
-
         // 获取消费方的applicationName
         String consumerApplicationName = getConsumerApplicationName(invokers);
 
@@ -66,7 +63,7 @@ public class GrayComponent {
 
         // 根据灰度标志进行筛选
         return filterSelect(invokers, url, invocation, loadBalance,
-                providerApplicationName, temInvokers, tag, consumerApplicationName, fsEa);
+                providerApplicationName, tag, consumerApplicationName, fsEa);
     }
 
     /**
@@ -82,9 +79,6 @@ public class GrayComponent {
      */
     public <T> Invoker<T> selectByIpAndApplication(List<Invoker<T>> invokers, URL url, Invocation invocation,
                                                    CustomLoadBalance loadBalance) {
-
-        // 临时invoker数组，里面可能是正常invoker、也可能是灰度invoker，具体看处理逻辑
-        List<Invoker<T>> temInvokers = new ArrayList<>();
 
         // 获取消费方的applicationName
         String consumerApplicationName = getConsumerApplicationName(invokers);
@@ -111,7 +105,7 @@ public class GrayComponent {
         }
 
         return filterSelect(invokers, url, invocation, loadBalance,
-                providerApplicationName, temInvokers, tag, consumerApplicationName, null);
+                providerApplicationName, tag, consumerApplicationName, null);
     }
 
     /**
@@ -246,65 +240,37 @@ public class GrayComponent {
 
     /**
      * 根据灰度标志，筛选服务
+     * 当对应环境的服务不存在，则降级
      * @param invokers 初始的invokers列表
      * @param url dubbo调用url
      * @param invocation 远程调用参数
      * @param loadBalance 负载均衡对象，如果经过选择后，可用invoker数量大于1，再使用该对象进行筛选
      * @param providerApplicationName 提供方的applicationName
-     * @param temInvokers 临时invokers列表
      * @param tag 是否灰度标志   true灰度  false正式
      * @param consumerApplicationName 消费方的应用名称
      * @param fsEa 企业账号，可为空
      * @return 经过筛选后的invoker
      */
     private <T> Invoker<T> filterSelect(List<Invoker<T>> invokers, URL url, Invocation invocation,
-                                        CustomLoadBalance loadBalance, String providerApplicationName,
-                                        List<Invoker<T>> temInvokers, boolean tag,
+                                        CustomLoadBalance loadBalance, String providerApplicationName, boolean tag,
                                         String consumerApplicationName, String fsEa) {
-        // tag标志判断是否灰度
-        if (tag) {
 
-            String grayGroup = getGrayGroupName(fsEa, consumerApplicationName);
+        // 临时invoker数组，里面可能是正常invoker、也可能是灰度invoker，具体看处理逻辑
+        List<Invoker<T>> temInvokers = new ArrayList<>();
 
+        // 筛选服务
+        doFilterSelect(invokers, url, invocation, tag, consumerApplicationName, fsEa, temInvokers);
 
-            // 选择灰度服务
-            if (StringUtils.isNotEmpty(grayGroup)) {
+        // 后置处理
+        return afterFilterSelect(invokers, url, invocation, loadBalance,
+                providerApplicationName, temInvokers);
+    }
 
-                findGrayService(invokers, temInvokers, grayGroup);
-            }
-
-            if (CollectionUtils.isEmpty(temInvokers)) {
-
-                // 这个服务没有灰度服务，降级，使用正常服务
-                findFormalService(invokers, temInvokers);
-                setGroupInfo(invocation, StringUtils.EMPTY);
-
-            } else {
-                // 已经筛选出灰度服务，把url字段的group改成灰度值
-                setGroupInfo(invocation, grayGroup);
-            }
-
-        } else {
-
-            // 选择正常服务
-            findFormalService(invokers, temInvokers);
-
-            if (CollectionUtils.isEmpty(temInvokers)) {
-
-                // 这个服务没有正常服务，降级，使用灰度服务
-                String grayGroup = getGrayGroupName(fsEa, consumerApplicationName);
-                findGrayService(invokers, temInvokers, grayGroup);
-                setGroupInfo(invocation, grayGroup);
-
-            } else {
-                // 已经筛选出正常服务，把url字段的group值设置为空字符串
-                setGroupInfo(invocation, "");
-            }
-        }
-
+    private <T> Invoker<T> afterFilterSelect(List<Invoker<T>> invokers, URL url, Invocation invocation,
+                                             CustomLoadBalance loadBalance, String providerApplicationName, List<Invoker<T>> temInvokers) {
         // 到这里，正常情况下，肯定已经筛选出invoker列表了
         if (CollectionUtils.isEmpty(temInvokers)) {
-            // 如果还没有服务，可能是别的问题，直接调用传入的负载均衡
+            // 如果还没有服务，可能是别的问题，直接调用传入的负载均衡，只能随机选择一个，保证核心业务正常运行
             LOGGER.error("componentSelect fail, please check, providerApplicationName={}", providerApplicationName);
             return loadBalance.superFilterSelect(invokers, url, invocation);
 
@@ -315,6 +281,62 @@ public class GrayComponent {
                 // 选出的服务如果大于1，再进行负载均衡策略
                 return loadBalance.superFilterSelect(temInvokers, url, invocation);
             }
+        }
+    }
+
+    private <T> void doFilterSelect(List<Invoker<T>> invokers, URL url, Invocation invocation, boolean tag,
+                                        String consumerApplicationName, String fsEa, List<Invoker<T>> temInvokers) {
+        // tag标志判断是否灰度
+        if (tag) {
+
+            // 筛选灰度服务
+            doGrayFilterSelect(invokers, invocation, consumerApplicationName, fsEa, temInvokers);
+
+        } else {
+
+            // 选择正常服务
+            doFormatFilterSelect(invokers, invocation, consumerApplicationName, fsEa, temInvokers);
+        }
+    }
+
+    private <T> void doFormatFilterSelect(List<Invoker<T>> invokers, Invocation invocation,
+                                          String consumerApplicationName, String fsEa, List<Invoker<T>> temInvokers) {
+
+        findFormalService(invokers, temInvokers);
+
+        if (CollectionUtils.isEmpty(temInvokers)) {
+
+            // 这个服务没有正常服务，降级，使用灰度服务
+            String grayGroup = getGrayGroupName(fsEa, consumerApplicationName);
+            findGrayService(invokers, temInvokers, grayGroup);
+            setGroupInfo(invocation, grayGroup);
+
+        } else {
+            // 已经筛选出正常服务，把url字段的group值设置为空字符串
+            setGroupInfo(invocation, StringUtils.EMPTY);
+        }
+    }
+
+    private <T> void doGrayFilterSelect(List<Invoker<T>> invokers, Invocation invocation,
+                                    String consumerApplicationName, String fsEa, List<Invoker<T>> temInvokers) {
+        String grayGroup = getGrayGroupName(fsEa, consumerApplicationName);
+
+
+        // 选择灰度服务
+        if (StringUtils.isNotEmpty(grayGroup)) {
+
+            findGrayService(invokers, temInvokers, grayGroup);
+        }
+
+        if (CollectionUtils.isEmpty(temInvokers)) {
+
+            // 这个服务没有灰度服务，降级，使用正常服务
+            findFormalService(invokers, temInvokers);
+            setGroupInfo(invocation, StringUtils.EMPTY);
+
+        } else {
+            // 已经筛选出灰度服务，把url字段的group改成灰度值
+            setGroupInfo(invocation, grayGroup);
         }
     }
 
