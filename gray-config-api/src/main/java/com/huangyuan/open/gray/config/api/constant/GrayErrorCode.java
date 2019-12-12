@@ -12,8 +12,6 @@ package com.huangyuan.open.gray.config.api.constant;
  * 成功的：C12006
  * 警告的：C22006
  * 失败的：C32006
- * Create by suxq on 2018/05/14.
- * @author suxq
  */
 public enum GrayErrorCode {
     // 成功

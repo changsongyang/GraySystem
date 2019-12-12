@@ -1,10 +1,5 @@
 package com.huangyuan.open.gray.config.api.constant;
 
-/**
- *
- * @author suxq
- * @date 2018/6/14
- */
 public enum StatusTypeEnum {
     //开启
     OPEN(1, "(!@#$)wechat_union.gray.enum.status_open"),

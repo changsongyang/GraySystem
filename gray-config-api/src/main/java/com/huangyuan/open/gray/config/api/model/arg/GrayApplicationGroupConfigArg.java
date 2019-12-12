@@ -2,11 +2,6 @@ package com.huangyuan.open.gray.config.api.model.arg;
 
 import java.io.Serializable;
 
-/**
- *
- * @author suxq
- * @date 2018/8/27
- */
 public class GrayApplicationGroupConfigArg implements Serializable{
 
     /**

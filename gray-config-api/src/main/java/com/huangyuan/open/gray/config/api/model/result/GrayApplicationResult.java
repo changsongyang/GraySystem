@@ -5,11 +5,6 @@ import com.huangyuan.open.gray.config.api.constant.StatusTypeEnum;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- *
- * @author suxq
- * @date 2018/8/27
- */
 public class GrayApplicationResult implements Serializable{
 
     /**
