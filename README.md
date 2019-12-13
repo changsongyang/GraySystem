@@ -20,6 +20,11 @@
 ## 系统组成
 整体分为：灰度配置服务、代理服务、灰度组件（核心）
 ![Snip20180920_1](http://ww2.sinaimg.cn/large/006y8mN6gy1g6ua2h29mdj30z20h075i.jpg)
+- `gray-base` 为模块之间公共类
+- `gray-config-admin` 是灰度系统的后台管理界面
+- `gray-config-provider` 是灰度配置模块
+- `gray-core` 灰度系统的核心组件
+- `gray-proxy` 灰度代理模块
 
 
 ## 使用方法
