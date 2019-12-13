@@ -29,25 +29,25 @@
   
 2、配置filter <br/>
  （1）创建 com.alibaba.dubbo.rpc.Filter文件
-  内容是 grayFilter=com.facishare.wechat.union.common.component.DubboGrayFilter
-  如果需要自定义filter，可以继承com.facishare.wechat.union.common.component.DubboGrayFilter，
-  然后在等号后面写上实现类
+  内容是 grayFilter=com.huangyuan.open.gray.common.component.DubboGrayFilter
+  如果需要自定义filter，可以继承com.huangyuan.open.gray.common.component.DubboGrayFilter，然后在等号后面写上实现类
+  不过Dubbo支持多个Filter，所以不要太耦合。
   
 3、配置loadBalance
  （1）创建 com.alibaba.dubbo.rpc.cluster.LoadBalance文件
-  内容是 grayLoadBalance=com.facishare.xxx.xxx.xxxLoadBalance
+  内容是 grayLoadBalance=com.huangyuan.open.gray.common.component.GrayLoadBalance
   普通项目只要进行步骤（1）就可以了
   
  （2）在web、fcp项目中，需要创建子类xxxLoadBalance，并且把实现类路径写在等号后面，
   主要是获取fsEa
   
 4、spring配置文件中添加：<br/>
-  `<import resource="classpath*:/spring/wechat-union-common.xml"/>`
+  `<import resource="classpath*:/spring/gray-common.xml"/>`
   
   
 PS：简单来说，除了web接入层的项目，其他项目只要<br/>
  （1）创建com.alibaba.dubbo.rpc.Filter、com.alibaba.dubbo.rpc.cluster.LoadBalance文件
- （2）导入`<import resource="classpath*:/spring/wechat-union-common.xml"/>`
+ （2）导入`<import resource="classpath*:/spring/gray-common.xml"/>`
 
 
 
