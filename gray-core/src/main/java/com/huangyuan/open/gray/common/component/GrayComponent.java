@@ -113,6 +113,10 @@ public class GrayComponent {
      *          因为一个服务只有1个provider的情况下，不走loadBalance，但是group是*的情况下，无法调用provider，
      *          因此正常服务，需要设置group的值为空串，这样子在provider端，就不会把group的值拼成key了
      * 先到loadBalance再到filter，在filter里面设置*（正常服务的group）为空字符串
+     *
+     *
+     * dadasdasdasdasd
+     *
      * @param invocation 远程调用参数
      */
     public static void setFormalServiceGroup(Invocation invocation) {
